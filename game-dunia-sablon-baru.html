@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tebak Kata: Dunia Sablon</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --text-color: #34495e;
+            --purple-color: #8e44ad;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: var(--text-color);
+            background-image: url('https://img.freepik.com/free-vector/watercolor-abstract-purple-background_23-2149120778.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        h1, h2, h3 {
+            color: var(--dark-color);
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            color: var(--purple-color);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            margin-top: 0;
+            color: #9b59b6;
+            font-size: 1.8rem;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 10px 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-purple {
+            background-color: var(--purple-color);
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: var(--light-color);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .info-box {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .info-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        
+        .guesses-left {
+            color: var(--danger-color);
+        }
+        
+        .timer {
+            color: var(--secondary-color);
+        }
+        
+        .points {
+            color: var(--primary-color);
+        }
+        
+        .word-display {
+            font-size: 2rem;
+            letter-spacing: 10px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            color: var(--dark-color);
+            min-height: 60px;
+        }
+        
+        .hint {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        .keyboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin: 30px 0;
+        }
+        
+        .key {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .key:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        .key:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .key.correct {
+            background-color: var(--secondary-color);
+        }
+        
+        .key.wrong {
+            background-color: var(--danger-color);
+        }
+        
+        .message {
+            font-size: 1.1rem;
+            margin: 20px 0;
+            min-height: 27px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--secondary-color);
+        }
+        
+        .error {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger-color);
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: var(--light-color);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        
+        .instructions {
+            text-align: left;
+            margin: 25px 0;
+            padding: 20px;
+            background-color: var(--light-color);
+            border-radius: 10px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .developer-info {
+            margin-top: 30px;
+            text-align: center;
+            font-style: italic;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .result-container {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .result-score {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 20px 0;
+        }
+        
+        .result-feedback {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .question-counter {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .welcome-message {
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .player-info {
+            background-color: var(--light-color);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .player-name {
+            font-weight: bold;
+            color: var(--purple-color);
+        }
+        
+        .player-nim {
+            font-style: italic;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .word-display {
+                font-size: 1.5rem;
+                letter-spacing: 5px;
+            }
+            
+            .key {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div class="screen active" id="welcome-screen">
+            <div class="card">
+                <h1>Tebak Kata: Dunia Sablon</h1>
+                <h2>Selamat Datang!</h2>
+                
+                <div class="welcome-message">
+                    <p>Halo mahasiswa Teknologi Pendidikan!</p>
+                    <p>Selamat datang di permainan <strong>Tebak Kata: Dunia Sablon</strong>.</p>
+                    <p>Permainan ini akan menguji pengetahuan Anda tentang istilah-istilah dalam teknik sablon.</p>
+                    <p>Isi data diri Anda terlebih dahulu untuk memulai permainan.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="player-name" class="form-label">Nama Lengkap:</label>
+                    <input type="text" id="player-name" class="form-control" placeholder="Masukkan nama Anda">
+                </div>
+                
+                <div class="form-group">
+                    <label for="player-nim" class="form-label">NIM:</label>
+                    <input type="text" id="player-nim" class="form-control" placeholder="Masukkan NIM Anda">
+                </div>
+                
+                <div style="text-align: center;">
+                    <button class="btn btn-purple" id="next-btn">Lanjutkan</button>
+                </div>
+                
+                <div class="developer-info">
+                    <p>Dikembangkan oleh: <strong>Fajrin Baids, S.Pd., M.Pd.</strong></p>
+                    <p>Prodi Teknologi Pendidikan FIP UNM</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Home Screen -->
+        <div class="screen" id="home-screen">
+            <div class="card">
+                <h1>Tebak Kata: Dunia Sablon</h1>
+                <h2>Uji Pengetahuan Teknik Sablon Anda</h2>
+                
+                <div class="player-info">
+                    <div class="player-name" id="display-player-name"></div>
+                    <div class="player-nim" id="display-player-nim"></div>
+                </div>
+                
+                <div class="instructions">
+                    <h3>Petunjuk Permainan:</h3>
+                    <ol>
+                        <li>Anda akan diberikan petunjuk tentang istilah dalam dunia sablon</li>
+                        <li>Tebak kata yang dimaksud dengan menekan huruf-huruf pada keyboard virtual</li>
+                        <li>Setiap jawaban benar akan memberi Anda <strong>10 poin</strong></li>
+                        <li>Anda memiliki waktu <strong>90 detik</strong> untuk menjawab setiap soal</li>
+                        <li>Setiap kesalahan menebak huruf akan mengurangi kesempatan Anda</li>
+                        <li>Jika berhasil menebak kata sebelum waktu habis, Anda mendapatkan poin</li>
+                        <li>Jika waktu habis atau kesempatan habis sebelum kata tertebak, Anda tidak mendapatkan poin</li>
+                    </ol>
+                    
+                    <p>Total ada 10 soal dengan total poin maksimal 100 poin!</p>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button class="btn btn-success" id="start-btn">Mulai Permainan</button>
+                    <button class="btn btn-primary" id="back-btn">Kembali</button>
+                </div>
+                
+                <div class="developer-info">
+                    <p>Dikembangkan oleh: <strong>Fajrin Baids, S.Pd., M.Si</strong></p>
+                    <p>Prodi Teknologi Pendidikan FIP UNM</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game Screen -->
+        <div class="screen" id="game-screen">
+            <div class="card">
+                <h1>Tebak Kata: Dunia Sablon</h1>
+                <div class="player-info">
+                    <div class="player-name" id="game-player-name"></div>
+                    <div class="player-nim" id="game-player-nim"></div>
+                </div>
+                
+                <div class="question-counter" id="question-counter">Soal 1 dari 10</div>
+                
+                <div class="game-info">
+                    <div class="info-box">
+                        <div class="info-label">Sisa Kesempatan</div>
+                        <div class="info-value guesses-left" id="guesses-left">6</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">Waktu Tersisa</div>
+                        <div class="info-value timer" id="timer">01:30</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">Poin Anda</div>
+                        <div class="info-value points" id="points">0</div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                
+                <p class="hint">Petunjuk: <span id="hint-text"></span></p>
+                
+                <div class="word-display" id="word-display"></div>
+                
+                <div class="message" id="message"></div>
+                
+                <div class="keyboard" id="keyboard"></div>
+                
+                <div style="text-align: center;">
+                    <button class="btn btn-warning" id="hint-btn">Minta Petunjuk</button>
+                    <button class="btn btn-danger" id="reset-btn">Ulangi Soal</button>
+                    <button class="btn btn-primary" id="home-btn">Kembali ke Menu</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Result Screen -->
+        <div class="screen" id="result-screen">
+            <div class="card">
+                <h1>Hasil Permainan</h1>
+                
+                <div class="player-info">
+                    <div class="player-name" id="result-player-name"></div>
+                    <div class="player-nim" id="result-player-nim"></div>
+                </div>
+                
+                <div class="result-container">
+                    <div class="info-label">Total Poin Anda:</div>
+                    <div class="result-score" id="final-score">0</div>
+                    
+                    <div class="result-feedback" id="result-feedback"></div>
+                    
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" id="play-again-btn">Main Lagi</button>
+                        <button class="btn btn-primary" id="final-home-btn">Kembali ke Menu</button>
+                    </div>
+                </div>
+                
+                <div class="developer-info">
+                    <p>Dikembangkan oleh: <strong>Fajrin Baids, S.Pd., M.Si</strong></p>
+                    <p>Prodi Teknologi Pendidikan FIP UNM</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Daftar kata dan petunjuk tentang teknik sablon
+        const questions = [
+            { hint: "Alat utama untuk menyapukan tinta ke atas screen.", answer: "rakel" },
+            { hint: "Proses memindahkan desain ke screen dengan bantuan cahaya.", answer: "afdruk" },
+            { hint: "Lapisan halus berbahan kimia yang digunakan untuk afdruk desain.", answer: "emulsi" },
+            { hint: "Bahan transparan untuk mencetak desain sablon sebelum afdruk.", answer: "film" },
+            { hint: "Jenis tinta yang menghasilkan permukaan sablon mengkilap dan tebal.", answer: "plastisol" },
+            { hint: "Teknik sablon yang tidak memerlukan alat manual dan bisa otomatis.", answer: "digital" },
+            { hint: "Teknik sablon menggunakan bahan yang akan berpindah ke kaos dengan panas.", answer: "transfer" },
+            { hint: "Proses terakhir setelah penyablonan, biasanya dengan setrika atau hot gun.", answer: "finishing" },
+            { hint: "Alat berbentuk bingkai dengan kain kasa yang digunakan sebagai media cetak.", answer: "screen" },
+            { hint: "Proses pemanasan hasil sablon agar tinta menempel sempurna.", answer: "curing" }
+        ];
+        
+        // Variabel game
+        let currentQuestionIndex = 0;
+        let selectedWord = "";
+        let guessedLetters = [];
+        let wrongGuesses = 0;
+        const maxWrongGuesses = 6;
+        let timeLeft = 90; // 90 detik (1.5 menit)
+        let timer;
+        let gameActive = false;
+        let score = 0;
+        let questionsAnswered = 0;
+        let playerName = "";
+        let playerNim = "";
+        
+        // Elemen DOM
+        const welcomeScreen = document.getElementById("welcome-screen");
+        const homeScreen = document.getElementById("home-screen");
+        const gameScreen = document.getElementById("game-screen");
+        const resultScreen = document.getElementById("result-screen");
+        const wordDisplay = document.getElementById("word-display");
+        const hintText = document.getElementById("hint-text");
+        const messageEl = document.getElementById("message");
+        const guessesLeftEl = document.getElementById("guesses-left");
+        const timerEl = document.getElementById("timer");
+        const progressBar = document.getElementById("progress-bar");
+        const pointsEl = document.getElementById("points");
+        const questionCounterEl = document.getElementById("question-counter");
+        const keyboardEl = document.getElementById("keyboard");
+        const finalScoreEl = document.getElementById("final-score");
+        const resultFeedbackEl = document.getElementById("result-feedback");
+        
+        // Elemen input player
+        const playerNameInput = document.getElementById("player-name");
+        const playerNimInput = document.getElementById("player-nim");
+        const displayPlayerName = document.getElementById("display-player-name");
+        const displayPlayerNim = document.getElementById("display-player-nim");
+        const gamePlayerName = document.getElementById("game-player-name");
+        const gamePlayerNim = document.getElementById("game-player-nim");
+        const resultPlayerName = document.getElementById("result-player-name");
+        const resultPlayerNim = document.getElementById("result-player-nim");
+        
+        // Tombol
+        const nextBtn = document.getElementById("next-btn");
+        const backBtn = document.getElementById("back-btn");
+        const startBtn = document.getElementById("start-btn");
+        const resetBtn = document.getElementById("reset-btn");
+        const homeBtn = document.getElementById("home-btn");
+        const hintBtn = document.getElementById("hint-btn");
+        const playAgainBtn = document.getElementById("play-again-btn");
+        const finalHomeBtn = document.getElementById("final-home-btn");
+        
+        // Fungsi untuk menampilkan screen tertentu
+        function showScreen(screen) {
+            document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+            document.getElementById(screen).classList.add("active");
+        }
+        
+        // Inisialisasi keyboard
+        function initKeyboard() {
+            keyboardEl.innerHTML = "";
+            for (let i = 65; i <= 90; i++) {
+                const letter = String.fromCharCode(i).toLowerCase();
+                const button = document.createElement("button");
+                button.className = "key";
+                button.textContent = letter;
+                button.id = `key-${letter}`;
+                button.addEventListener("click", () => handleGuess(letter));
+                keyboardEl.appendChild(button);
+            }
+        }
+        
+        // Mulai pertanyaan baru
+        function startNewQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                endGame();
+                return;
+            }
+            
+            selectedWord = questions[currentQuestionIndex].answer;
+            hintText.textContent = questions[currentQuestionIndex].hint;
+            guessedLetters = [];
+            wrongGuesses = 0;
+            timeLeft = 90;
+            gameActive = true;
+            
+            updateQuestionCounter();
+            updateDisplay();
+            updateTimerDisplay();
+            resetKeyboard();
+            startTimer();
+        }
+        
+        // Perbarui tampilan
+        function updateDisplay() {
+            // Tampilkan kata dengan garis bawah untuk huruf yang belum ditebak
+            const displayWord = selectedWord
+                .split("")
+                .map(letter => guessedLetters.includes(letter) ? letter : "_")
+                .join(" ");
+            
+            wordDisplay.textContent = displayWord;
+            guessesLeftEl.textContent = maxWrongGuesses - wrongGuesses;
+            pointsEl.textContent = score;
+            
+            // Cek jika menang
+            if (!displayWord.includes("_")) {
+                questionCorrect();
+            }
+            
+            // Cek jika kalah karena kesempatan habis
+            if (wrongGuesses >= maxWrongGuesses) {
+                questionFailed();
+            }
+        }
+        
+        // Handle tebakan
+        function handleGuess(letter) {
+            if (!gameActive) return;
+            
+            // Jika huruf sudah ditebak sebelumnya
+            if (guessedLetters.includes(letter)) {
+                return;
+            }
+            
+            guessedLetters.push(letter);
+            const button = document.getElementById(`key-${letter}`);
+            button.disabled = true;
+            
+            if (selectedWord.includes(letter)) {
+                button.classList.add("correct");
+                showMessage(`Huruf "${letter.toUpperCase()}" ada dalam kata!`, "success");
+            } else {
+                button.classList.add("wrong");
+                showMessage(`Huruf "${letter.toUpperCase()}" tidak ada dalam kata.`, "error");
+                wrongGuesses++;
+            }
+            
+            updateDisplay();
+        }
+        
+        // Tampilkan pesan
+        function showMessage(text, type) {
+            messageEl.textContent = text;
+            messageEl.className = "message " + type;
+        }
+        
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update progress bar
+            const progressPercentage = (timeLeft / 90) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            
+            // Ubah warna progress bar berdasarkan waktu tersisa
+            if (progressPercentage < 20) {
+                progressBar.style.backgroundColor = "var(--danger-color)";
+            } else if (progressPercentage < 50) {
+                progressBar.style.backgroundColor = "var(--warning-color)";
+            } else {
+                progressBar.style.backgroundColor = "var(--primary-color)";
+            }
+        }
+        
+        // Timer countdown
+        function startTimer() {
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    questionFailed();
+                }
+            }, 1000);
+        }
+        
+        // Reset keyboard
+        function resetKeyboard() {
+            document.querySelectorAll(".key").forEach(button => {
+                button.disabled = false;
+                button.className = "key";
+            });
+        }
+        
+        // Pertanyaan berhasil dijawab
+        function questionCorrect() {
+            clearInterval(timer);
+            gameActive = false;
+            score += 10;
+            questionsAnswered++;
+            showMessage(`Selamat! Jawaban benar: "${selectedWord.toUpperCase()}"`, "success");
+            pointsEl.textContent = score;
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    startNewQuestion();
+                } else {
+                    endGame();
+                }
+            }, 2000);
+        }
+        
+        // Pertanyaan gagal dijawab
+        function questionFailed() {
+            clearInterval(timer);
+            gameActive = false;
+            showMessage(`Waktu habis! Jawaban yang benar: "${selectedWord.toUpperCase()}"`, "error");
+            wordDisplay.textContent = selectedWord.split("").join(" ");
+            questionsAnswered++;
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    startNewQuestion();
+                } else {
+                    endGame();
+                }
+            }, 2000);
+        }
+        
+        // Update counter pertanyaan
+        function updateQuestionCounter() {
+            questionCounterEl.textContent = `Soal ${currentQuestionIndex + 1} dari ${questions.length}`;
+        }
+        
+        // Berikan petunjuk tambahan
+        function giveHint() {
+            if (!gameActive) return;
+            
+            // Cari huruf yang belum ditebak dalam kata
+            const unrevealedLetters = selectedWord
+                .split("")
+                .filter(letter => !guessedLetters.includes(letter));
+            
+            if (unrevealedLetters.length > 0) {
+                const randomLetter = unrevealedLetters[Math.floor(Math.random() * unrevealedLetters.length)];
+                handleGuess(randomLetter);
+                
+                // Kurangi waktu sebagai penalti untuk meminta petunjuk
+                timeLeft = Math.max(10, timeLeft - 15); // Minimal 10 detik tersisa
+                updateTimerDisplay();
+                
+                showMessage(`Petunjuk: Huruf "${randomLetter.toUpperCase()}" ada dalam kata!`, "success");
+            }
+        }
+        
+        // Akhiri permainan dan tampilkan hasil
+        function endGame() {
+            // Update informasi pemain di hasil
+            resultPlayerName.textContent = playerName;
+            resultPlayerNim.textContent = playerNim;
+            
+            showScreen("result-screen");
+            finalScoreEl.textContent = score;
+            
+            // Berikan umpan balik berdasarkan skor
+            let feedback = "";
+            if (score >= 90) {
+                feedback = `Selamat ${playerName}! Skor ${score} menunjukkan penguasaan yang LUAR BIASA tentang teknik sablon. Anda benar-benar memahami materi dengan sangat baik. Pertahankan prestasi ini!`;
+            } else if (score >= 70) {
+                feedback = `Bagus ${playerName}! Dengan skor ${score}, Anda menunjukkan pemahaman yang BAIK tentang teknik sablon. Masih ada sedikit ruang untuk meningkatkan pengetahuan Anda. Lanjutkan belajar!`;
+            } else if (score >= 50) {
+                feedback = `Tidak buruk ${playerName}. Skor ${score} menunjukkan pemahaman CUKUP tentang teknik sablon. Anda perlu mempelajari lebih dalam lagi materi ini untuk hasil yang lebih baik.`;
+            } else {
+                feedback = `${playerName}, skor Anda ${score} menunjukkan Anda perlu BELAJAR LEBIH GIAT lagi tentang teknik sablon. Jangan menyerah, pelajari kembali materinya dan coba lagi!`;
+            }
+            
+            resultFeedbackEl.textContent = feedback;
+        }
+        
+        // Reset permainan sepenuhnya
+        function resetGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            questionsAnswered = 0;
+            startNewQuestion();
+            showScreen("game-screen");
+        }
+        
+        // Event listeners
+        nextBtn.addEventListener("click", () => {
+            if (playerNameInput.value.trim() === "" || playerNimInput.value.trim() === "") {
+                alert("Silakan isi nama dan NIM terlebih dahulu!");
+                return;
+            }
+            
+            playerName = playerNameInput.value.trim();
+            playerNim = playerNimInput.value.trim();
+            
+            // Update informasi pemain di home screen
+            displayPlayerName.textContent = playerName;
+            displayPlayerNim.textContent = playerNim;
+            
+            showScreen("home-screen");
+        });
+        
+        backBtn.addEventListener("click", () => {
+            showScreen("welcome-screen");
+        });
+        
+        startBtn.addEventListener("click", () => {
+            // Update informasi pemain di game screen
+            gamePlayerName.textContent = playerName;
+            gamePlayerNim.textContent = playerNim;
+            
+            resetGame();
+        });
+        
+        resetBtn.addEventListener("click", () => {
+            clearInterval(timer);
+            startNewQuestion();
+        });
+        
+        homeBtn.addEventListener("click", () => {
+            clearInterval(timer);
+            showScreen("home-screen");
+        });
+        
+        hintBtn.addEventListener("click", giveHint);
+        
+        playAgainBtn.addEventListener("click", resetGame);
+        
+        finalHomeBtn.addEventListener("click", () => {
+            showScreen("home-screen");
+        });
+        
+        // Inisialisasi welcome screen dan keyboard
+        showScreen("welcome-screen");
+        initKeyboard();
+    </script>
+</body>
+</html>
